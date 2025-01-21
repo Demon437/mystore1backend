@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "echo 'Skipping build step for backend'"
+    "build": "npm install && echo 'Skipping build step for backend'"
   },
   "dependencies": {
     "cors": "^2.8.5",
