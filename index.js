@@ -25,15 +25,14 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, Date.now() + '-' + file.originalname); // Updated to use standard concatenation
   },
 });
 const upload = multer({ storage });
 
 const mockUsers = [
-  { email: 'eve.holt@reqres.in', password: 'ailwind' },
+  { email: 'eve.holt@reqres.in', password: 'tailwind' },
 ];
-
 
 app.post('/products', upload.single('pimage'), async (req, res) => {
   try {
@@ -61,7 +60,6 @@ app.post('/products', upload.single('pimage'), async (req, res) => {
     res.status(500).send('Error adding product');
   }
 });
-
 
 app.get('/products', async (req, res) => {
   try {
