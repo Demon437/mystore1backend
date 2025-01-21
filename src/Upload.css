@@ -1,0 +1,35 @@
+/* Upload.css */
+
+/* Customizing the form group for input labels and controls */
+.form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-control {
+    width: 100%; /* Ensure full width for inputs */
+    padding: 0.75rem; /* Adjust padding for better spacing */
+    border-radius: 5px; /* Rounded corners for input fields */
+    border: 1px solid #ccc; /* Border color */
+  }
+  
+  label {
+    font-weight: bold; /* Bold labels for better visibility */
+    margin-bottom: 0.5rem; /* Slight margin below labels */
+  }
+  
+  /* Button styling */
+  button {
+    width: 100%; /* Full-width button */
+    height: 50px; /* Fixed height for the button */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3; /* Hover effect */
+  }
+  
