@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 4000;
 // Configure CORS to allow requests from your frontend URL
 app.use(
   cors({
-    origin: 'https://mystore1-4usx.onrender.com', // Allow your frontend URL
+    origin: ['https://mystore1-4usx.onrender.com', 'http://localhost:3000'], // Allow your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
     credentials: true, // Allow cookies if needed
   })
