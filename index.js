@@ -8,33 +8,45 @@ const path = require('path');
 const Product = require('./models/Product');
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+// Configure CORS to allow requests from your frontend URL
+app.use(
+  cors({
+    origin: 'https://mystore1-4usx.onrender.com', // Allow your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    credentials: true, // Allow cookies if needed
+  })
+);
+
 app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Updated MongoDB connection
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
+// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // Updated to use standard concatenation
+    cb(null, Date.now() + '-' + file.originalname);
   },
 });
 const upload = multer({ storage });
 
+// Mock users for login
 const mockUsers = [
   { email: 'eve.holt@reqres.in', password: 'tailwind' },
 ];
 
+// Add Product API
 app.post('/products', upload.single('pimage'), async (req, res) => {
   try {
     const { pname, pprice } = req.body;
@@ -62,6 +74,7 @@ app.post('/products', upload.single('pimage'), async (req, res) => {
   }
 });
 
+// Get All Products API
 app.get('/products', async (req, res) => {
   try {
     const products = await Product.find();
@@ -72,6 +85,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
+// Get Product by ID API
 app.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -83,6 +97,7 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
+// Login API
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -91,7 +106,7 @@ app.post('/api/login', (req, res) => {
   if (user) {
     return res.status(200).json({
       message: 'Login successful',
-      token: 'mock-token-123456',
+      token: 'mock-token-123456', // Mock token for simplicity
     });
   } else {
     return res.status(401).json({
@@ -100,10 +115,12 @@ app.post('/api/login', (req, res) => {
   }
 });
 
+// Root Route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
