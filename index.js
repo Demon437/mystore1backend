@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken');
 const Product = require('./models/Product');
 
 dotenv.config();
@@ -27,7 +26,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
@@ -42,49 +41,36 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Authentication Middleware
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Unauthorized access' });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-};
-
 // Mock users for login
 const mockUsers = [
   { email: 'eve.holt@reqres.in', password: 'tailwind' },
 ];
 
-// Add Product API (with authentication)
-app.post('/api/products', authenticateToken, upload.single('pimage'), async (req, res) => {
+// Add Product API
+app.post('/api/products', upload.single('pimage'), async (req, res) => {
   try {
-    const { pname, pprice, pdesc } = req.body;
+    const { pname, pprice } = req.body;
 
     if (!pname || !pprice) {
-      return res.status(400).json({ error: 'Product name and price are required.' });
+      return res.status(400).send('Product name and price are required.');
     }
 
     const existingProduct = await Product.findOne({ pname });
     if (existingProduct) {
-      return res.status(400).json({ error: 'Product with this name already exists.' });
+      return res.status(400).send('Product with this name already exists.');
     }
 
     const product = new Product({
       pname,
       pprice,
-      pdesc,
       pimage: req.file ? `/uploads/${req.file.filename}` : null,
     });
 
     await product.save();
-    res.status(201).json({ message: 'Product added successfully!', product });
+    res.status(201).send('Product added successfully!');
   } catch (err) {
     console.error('Error adding product:', err);
-    res.status(500).json({ error: 'Error adding product' });
+    res.status(500).send('Error adding product');
   }
 });
 
@@ -94,8 +80,8 @@ app.get('/products', async (req, res) => {
     const products = await Product.find();
     res.status(200).json(products);
   } catch (err) {
-    console.error('Error fetching products:', err);
-    res.status(500).json({ error: 'Error fetching products' });
+    console.error(err);
+    res.status(500).send('Error fetching products');
   }
 });
 
@@ -103,11 +89,11 @@ app.get('/products', async (req, res) => {
 app.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    if (!product) return res.status(404).send('Product not found');
     res.status(200).json(product);
   } catch (err) {
-    console.error('Error fetching product:', err);
-    res.status(500).json({ error: 'Error fetching product' });
+    console.error(err);
+    res.status(500).send('Error fetching product');
   }
 });
 
@@ -118,10 +104,9 @@ app.post('/api/login', (req, res) => {
   const user = mockUsers.find((u) => u.email === email && u.password === password);
 
   if (user) {
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
     return res.status(200).json({
       message: 'Login successful',
-      token,
+      token: 'mock-token-123456', // Mock token for simplicity
     });
   } else {
     return res.status(401).json({
