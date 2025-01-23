@@ -47,7 +47,7 @@ const mockUsers = [
 ];
 
 // Add Product API
-app.post('/products', upload.single('pimage'), async (req, res) => {
+app.post('/api/products', upload.single('pimage'), async (req, res) => {
   try {
     const { pname, pprice } = req.body;
 
