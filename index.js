@@ -115,6 +115,14 @@ app.post('/api/login', (req, res) => {
   }
 });
 
+// Serve React build files
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Handle all other routes and serve React's index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build/index.html'));
+});
+
 // Root Route
 app.get('/', (req, res) => {
   res.send('API is running...');
