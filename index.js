@@ -24,9 +24,6 @@ app.use(
 app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'build')));
-
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
@@ -118,9 +115,9 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// Wildcard route to handle React routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Root Route
+app.get('/', (req, res) => {
+  res.send('API is running...');
 });
 
 // Start the server
