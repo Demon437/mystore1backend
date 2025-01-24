@@ -26,7 +26,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
@@ -75,7 +78,7 @@ app.post('/api/products', upload.single('pimage'), async (req, res) => {
 });
 
 // Get All Products API
-app.get('/products', async (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
     res.status(200).json(products);
@@ -86,7 +89,7 @@ app.get('/products', async (req, res) => {
 });
 
 // Get Product by ID API
-app.get('/products/:id', async (req, res) => {
+app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).send('Product not found');
@@ -121,11 +124,6 @@ app.use(express.static(path.join(__dirname, 'build')));
 // Handle all other routes and serve React's index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
-});
-
-// Root Route
-app.get('/', (req, res) => {
-  res.send('API is running...');
 });
 
 // Start the server
